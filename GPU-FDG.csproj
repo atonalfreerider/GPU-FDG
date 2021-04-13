@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ComputeSharp" Version="2.0.0-alpha.1" />
+      <PackageReference Include="ComputeSharp" Version="2.0.0-alpha.2" />
       <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20574.7" />
       <PackageReference Include="System.Data.SQLite" Version="1.0.113.7" />
     </ItemGroup>
