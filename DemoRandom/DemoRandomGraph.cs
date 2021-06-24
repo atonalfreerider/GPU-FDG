@@ -59,8 +59,8 @@ namespace GPU_FDG.DemoRandom
                 ForceDirectedGraph.Node nodeA = randomNodes[nodeAIdx];
                 ForceDirectedGraph.Node nodeB = randomNodes[nodeBIdx];
                 
-                nodeA.MyEdges.Add(nodeBIdx);
-                nodeB.MyEdges.Add(nodeAIdx);
+                nodeA.MyEdgesAndPower.Add(nodeBIdx, 1);
+                nodeB.MyEdgesAndPower.Add(nodeAIdx, 1);
             }
 
             Vector3[] results = forceDirectedGraph.RunGraph(args.Iterations);

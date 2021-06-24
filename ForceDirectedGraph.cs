@@ -101,9 +101,8 @@ namespace GPU_FDG
             // and node [2] owns the values of allEdges from 8-9
             int[] edgeBlockLengths = new int[nodeArrayLength];
             int[] edgeBlockStartIndices = new int[nodeArrayLength];
-
-            // all edges flattened together in one list
-            List<int> allEdges = new List<int>();
+            List<int> edgeIndices = new List<int>();
+            List<int> edgePowers = new List<int>();
 
             int count = 0;
             for (int idx = 0; idx < nodeArrayLength; idx++)
@@ -113,36 +112,39 @@ namespace GPU_FDG
 
                 nodePositions[idx] = node.Position;
                 edgeBlockStartIndices[idx] = count;
-                edgeBlockLengths[idx] = node.MyEdges.Count;
-                count += node.MyEdges.Count;
+                edgeBlockLengths[idx] = node.MyEdgesAndPower.Count;
+                count += node.MyEdgesAndPower.Count;
 
-                allEdges.AddRange(node.MyEdges.Select(Convert.ToInt32));
+                foreach ((uint edgeIdx, int edgePower) in node.MyEdgesAndPower)
+                {
+                    edgeIndices.Add((int) edgeIdx);
+                    edgePowers.Add(edgePower);
+                }
             }
 
-            int[] edgeIndices = allEdges.ToArray();
-
             using ReadWriteBuffer<Float3> nodePositionsBuffer = Gpu.Default.AllocateReadWriteBuffer(nodePositions);
-            using ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer =
-                Gpu.Default.AllocateReadOnlyBuffer(edgeBlockStartIndices);
+            using ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer = Gpu.Default.AllocateReadOnlyBuffer(edgeBlockStartIndices);
             using ReadOnlyBuffer<int> edgeBlockLengthsBuffer = Gpu.Default.AllocateReadOnlyBuffer(edgeBlockLengths);
-            using ReadOnlyBuffer<int> edgeIndicesBuffer = Gpu.Default.AllocateReadOnlyBuffer(edgeIndices);
+            using ReadOnlyBuffer<int> edgeIndicesBuffer = Gpu.Default.AllocateReadOnlyBuffer(edgeIndices.ToArray());
+            using ReadOnlyBuffer<int> edgePowersBuffer = Gpu.Default.AllocateReadOnlyBuffer(edgePowers.ToArray());
 
-            ForceKernelShader forceKernelShader = new(
+            ForceKernelShader nodeBalanceDisplacementsShader = new(
                 nodePositionsBuffer,
                 edgeBlockStartIndicesBuffer,
                 edgeBlockLengthsBuffer,
                 edgeIndicesBuffer,
+                edgePowersBuffer,
                 nodeArrayLength,
                 universalRepulsiveForce,
                 universalSpringForce,
                 speedLimit);
-
+            
             for (int i = 1; i <= iterations; i++)
             {
                 Console.WriteLine($"{i}/{iterations}");
                 try
                 {
-                    Gpu.Default.For(nodeArrayLength, forceKernelShader);
+                    Gpu.Default.For(nodeArrayLength, nodeBalanceDisplacementsShader);
                 }
                 catch (TargetInvocationException e)
                 {
@@ -169,7 +171,7 @@ namespace GPU_FDG
         public class Node
         {
             public Vector3 Position;
-            public readonly List<uint> MyEdges = new();
+            public readonly Dictionary<uint, int> MyEdgesAndPower = new();
         }
     }
 
@@ -181,6 +183,7 @@ namespace GPU_FDG
         public readonly ReadOnlyBuffer<int> edgeBlockStartIndices;
         public readonly ReadOnlyBuffer<int> edgeBlockLengths;
         public readonly ReadOnlyBuffer<int> edgeIndices;
+        public readonly ReadOnlyBuffer<int> edgePowers;
         public readonly int nodeArrayLength;
 
         // physics
@@ -193,6 +196,7 @@ namespace GPU_FDG
             ReadOnlyBuffer<int> edgeBlockStartIndices,
             ReadOnlyBuffer<int> edgeBlockLengths,
             ReadOnlyBuffer<int> edgeIndices,
+            ReadOnlyBuffer<int> edgePowers,
             int nodeArrayLength,
             float universalRepulsiveForce,
             float universalSpringForce,
@@ -202,6 +206,7 @@ namespace GPU_FDG
             this.edgeBlockStartIndices = edgeBlockStartIndices;
             this.edgeBlockLengths = edgeBlockLengths;
             this.edgeIndices = edgeIndices;
+            this.edgePowers = edgePowers;
             this.nodeArrayLength = nodeArrayLength;
             this.universalRepulsiveForce = universalRepulsiveForce;
             this.universalSpringForce = universalSpringForce;
@@ -235,14 +240,14 @@ namespace GPU_FDG
 
                 // Hooke's Law attractive force p2 <- p1
                 // also divide by the amount of edges acting on this node as a dampening effect
-                float hF = universalSpringForce * distance;
+                float hF = edgePowers[z] * universalSpringForce * distance;
 
                 resultForceAndDirection -= Hlsl.Mul(hF, direction);
             }
 
             // iterate through ALL nodes and determine the repulsive forces acting on this node
             // this is an O(n^2) operation
-            for (int j = 0; j < nodeArrayLength; j++)
+            for (int j = 0; j < nodeArrayLength; j ++)
             {
                 if (i == j)
                 {
