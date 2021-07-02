@@ -15,6 +15,7 @@ namespace GPU_FDG
             public float RepulsiveForce { get; set; }
             public int NumRandNodes { get; set; }
             public int NumRandConnections { get; set; }
+            public float SpeedLimit { get; set; }
         }
 
         static void Main(string[] args)
@@ -42,6 +43,10 @@ namespace GPU_FDG
                     new[] {"--numRandConnections", "-c"},
                     () => 0,
                     "Number of random connections"),
+                new Option<float>(
+                    new[] {"--speedLimit", "-l"},
+                    () => 20,
+                    "Speed Limit to prevent nodes from flying off to infinity"),
             };
 
             Argument outputArgument = new("DbPath")

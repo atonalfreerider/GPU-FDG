@@ -29,6 +29,8 @@ namespace GPU_FDG
         // The constant that resembles K in Hooke's Law to signify the strength of the attractive force on an edge.
         readonly float universalSpringForce;
 
+        readonly float speedLimit;
+
         bool keepRunning = true;
 
         /// <summary>
@@ -38,10 +40,12 @@ namespace GPU_FDG
         /// <param name="universalSpringForce">The constant attractive force between nodes that share an edge.</param>
         public ForceDirectedGraph(
             float universalRepulsiveForce = 1,
-            float universalSpringForce = .15f)
+            float universalSpringForce = .15f,
+            float speedLimit = 20)
         {
             this.universalRepulsiveForce = universalRepulsiveForce;
             this.universalSpringForce = universalSpringForce;
+            this.speedLimit = speedLimit;
 
             Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e)
             {
@@ -130,7 +134,8 @@ namespace GPU_FDG
                 edgeIndicesBuffer,
                 nodeArrayLength,
                 universalRepulsiveForce,
-                universalSpringForce);
+                universalSpringForce,
+                speedLimit);
 
             for (int i = 1; i <= iterations; i++)
             {
@@ -181,6 +186,7 @@ namespace GPU_FDG
         // physics
         public readonly float universalRepulsiveForce;
         public readonly float universalSpringForce;
+        public readonly float speedLimit;
 
         public ForceKernelShader(
             ReadWriteBuffer<Float3> nodePositions,
@@ -189,7 +195,8 @@ namespace GPU_FDG
             ReadOnlyBuffer<int> edgeIndices,
             int nodeArrayLength,
             float universalRepulsiveForce,
-            float universalSpringForce)
+            float universalSpringForce,
+            float speedLimit)
         {
             this.nodePositions = nodePositions;
             this.edgeBlockStartIndices = edgeBlockStartIndices;
@@ -198,6 +205,7 @@ namespace GPU_FDG
             this.nodeArrayLength = nodeArrayLength;
             this.universalRepulsiveForce = universalRepulsiveForce;
             this.universalSpringForce = universalSpringForce;
+            this.speedLimit = speedLimit;
         }
 
         public void Execute()
@@ -266,6 +274,12 @@ namespace GPU_FDG
             {
                 // catch asymptotic cases 
                 resultForceAndDirection = new Float3(0, 0, 0);
+            }
+
+            float forceMag = Hlsl.Length(resultForceAndDirection);
+            if (forceMag > speedLimit)
+            {
+                resultForceAndDirection = Hlsl.Mul(speedLimit / forceMag, resultForceAndDirection);
             }
 
             // set the final node position after this frame

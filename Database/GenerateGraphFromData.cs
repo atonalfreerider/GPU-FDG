@@ -16,7 +16,7 @@ namespace GPU_FDG.Database
             SqliteInput input = new(args.DbPath);
             Dictionary<int, DbNode> nodes = input.DeSerialize();
 
-            ForceDirectedGraph forceDirectedGraph = new(args.RepulsiveForce, args.SpringForce);
+            ForceDirectedGraph forceDirectedGraph = new(args.RepulsiveForce, args.SpringForce, args.SpeedLimit);
 
             Dictionary<int, ForceDirectedGraph.Node> fdgNodes = new Dictionary<int, ForceDirectedGraph.Node>();
 
