@@ -104,7 +104,7 @@ namespace GPU_FDG
             int count = 0;
             for (int idx = 0; idx < nodeArrayLength; idx++)
             {
-                nodes.TryGetValue((uint) idx, out Node node);
+                nodes.TryGetValue((uint)idx, out Node node);
                 if (node == null) continue;
 
                 nodePositions[idx] = node.Position;
@@ -168,7 +168,8 @@ namespace GPU_FDG
         }
     }
 
-    public readonly struct ForceKernelShader : IComputeShader
+    [AutoConstructor]
+    public readonly partial struct ForceKernelShader : IComputeShader
     {
         public readonly ReadWriteBuffer<Float3> nodePositions;
 
@@ -181,24 +182,6 @@ namespace GPU_FDG
         // physics
         public readonly float universalRepulsiveForce;
         public readonly float universalSpringForce;
-
-        public ForceKernelShader(
-            ReadWriteBuffer<Float3> nodePositions,
-            ReadOnlyBuffer<int> edgeBlockStartIndices,
-            ReadOnlyBuffer<int> edgeBlockLengths,
-            ReadOnlyBuffer<int> edgeIndices,
-            int nodeArrayLength,
-            float universalRepulsiveForce,
-            float universalSpringForce)
-        {
-            this.nodePositions = nodePositions;
-            this.edgeBlockStartIndices = edgeBlockStartIndices;
-            this.edgeBlockLengths = edgeBlockLengths;
-            this.edgeIndices = edgeIndices;
-            this.nodeArrayLength = nodeArrayLength;
-            this.universalRepulsiveForce = universalRepulsiveForce;
-            this.universalSpringForce = universalSpringForce;
-        }
 
         public void Execute()
         {
