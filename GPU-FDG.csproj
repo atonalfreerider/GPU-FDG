@@ -9,8 +9,9 @@
     <ItemGroup>
       <PackageReference Include="ComputeSharp" Version="2.0.0-alpha.9" />
       <PackageReference Include="ComputeSharp.Dynamic" Version="2.0.0-alpha.9" />
-      <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
-      <PackageReference Include="System.Data.SQLite" Version="1.0.115" />
+      <PackageReference Include="System.CommandLine" Version="2.0.0-beta2.21617.1" />
+      <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta2.21617.1" />
+      <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
     </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using System.CommandLine.Invocation;
+using System.CommandLine.NamingConventionBinder;
 using GPU_FDG.Database;
 using GPU_FDG.DemoRandom;
 
@@ -44,10 +44,7 @@ namespace GPU_FDG
                     "Number of random connections"),
             };
 
-            Argument outputArgument = new("DbPath")
-            {
-                ArgumentType = typeof(string)
-            };
+            Argument outputArgument = new("DbPath");
             rootCommand.Add(outputArgument);
 
             rootCommand.Description = "Force Directed Graph using ComputeSharp";
