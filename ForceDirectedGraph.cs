@@ -117,11 +117,11 @@ namespace GPU_FDG
 
             int[] edgeIndices = allEdges.ToArray();
 
-            using ReadWriteBuffer<Float3> nodePositionsBuffer = Gpu.Default.AllocateReadWriteBuffer(nodePositions);
+            using ReadWriteBuffer<Float3> nodePositionsBuffer = GraphicsDevice.Default.AllocateReadWriteBuffer(nodePositions);
             using ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer =
-                Gpu.Default.AllocateReadOnlyBuffer(edgeBlockStartIndices);
-            using ReadOnlyBuffer<int> edgeBlockLengthsBuffer = Gpu.Default.AllocateReadOnlyBuffer(edgeBlockLengths);
-            using ReadOnlyBuffer<int> edgeIndicesBuffer = Gpu.Default.AllocateReadOnlyBuffer(edgeIndices);
+                GraphicsDevice.Default.AllocateReadOnlyBuffer(edgeBlockStartIndices);
+            using ReadOnlyBuffer<int> edgeBlockLengthsBuffer = GraphicsDevice.Default.AllocateReadOnlyBuffer(edgeBlockLengths);
+            using ReadOnlyBuffer<int> edgeIndicesBuffer = GraphicsDevice.Default.AllocateReadOnlyBuffer(edgeIndices);
 
             ForceKernelShader forceKernelShader = new(
                 nodePositionsBuffer,
@@ -137,7 +137,7 @@ namespace GPU_FDG
                 Console.WriteLine($"{i}/{iterations}");
                 try
                 {
-                    Gpu.Default.For(nodeArrayLength, forceKernelShader);
+                    GraphicsDevice.Default.For(nodeArrayLength, forceKernelShader);
                 }
                 catch (TargetInvocationException e)
                 {
