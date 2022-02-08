@@ -29,6 +29,8 @@ public class ForceDirectedGraph
     // The constant that resembles K in Hooke's Law to signify the strength of the attractive force on an edge.
     readonly float universalSpringForce;
 
+    readonly float speedLimit;
+
     bool keepRunning = true;
 
     /// <summary>
@@ -38,10 +40,12 @@ public class ForceDirectedGraph
     /// <param name="universalSpringForce">The constant attractive force between nodes that share an edge.</param>
     public ForceDirectedGraph(
         float universalRepulsiveForce = 1,
-        float universalSpringForce = .15f)
+        float universalSpringForce = .15f,
+        float speedLimit = 20)
     {
         this.universalRepulsiveForce = universalRepulsiveForce;
         this.universalSpringForce = universalSpringForce;
+        this.speedLimit = speedLimit;
 
         Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e)
         {
@@ -132,7 +136,8 @@ public class ForceDirectedGraph
             edgeIndicesBuffer,
             nodeArrayLength,
             universalRepulsiveForce,
-            universalSpringForce);
+            universalSpringForce,
+            speedLimit);
 
         for (int i = 1; i <= iterations; i++)
         {
@@ -179,7 +184,8 @@ public readonly partial struct ForceKernelShader(
     ReadOnlyBuffer<int> edgeIndicesBuffer,
     int nodeArrayLength,
     float universalRepulsiveForce,
-    float universalSpringForce) : IComputeShader
+    float universalSpringForce,
+    float speedLimit) : IComputeShader
 {
     public void Execute()
     {
@@ -246,6 +252,12 @@ public readonly partial struct ForceKernelShader(
         {
             // catch asymptotic cases 
             resultForceAndDirection = new float3(0, 0, 0);
+        }
+
+        float forceMag = Hlsl.Length(resultForceAndDirection);
+        if (forceMag > speedLimit)
+        {
+            resultForceAndDirection = Hlsl.Mul(speedLimit / forceMag, resultForceAndDirection);
         }
 
         // set the final node position after this frame

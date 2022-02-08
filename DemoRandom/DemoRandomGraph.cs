@@ -21,10 +21,11 @@ static class DemoRandomGraph
         int iterations,
         float springForce, 
         float repulsiveForce,
+        float speedLimit,
         int numRandNodes,
         int numRandConnections)
     {
-        ForceDirectedGraph forceDirectedGraph = new(repulsiveForce, springForce);
+        ForceDirectedGraph forceDirectedGraph = new(repulsiveForce, springForce, speedLimit);
 
         ForceDirectedGraph.Node node0 = forceDirectedGraph.AddNodeToGraph(0);
         node0.Position = new Vector3(0, 0, 0);

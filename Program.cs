@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using GPU_FDG.Database;
 using GPU_FDG.DemoRandom;
@@ -26,10 +26,14 @@ static class Program
                 ["--repulsiveForce", "-e"],
                 () => 1,
                 "Universal repulsive force"),
+            new Option<float>(
+                ["--speedLimit", "-s"],
+                () => 20,
+                "Speed limit")
         };
 
         rootCommand.Handler = CommandHandler
-            .Create<string, int, float, float>(GenerateGraphFromData.RunGraph);
+            .Create<string, int, float, float, float>(GenerateGraphFromData.RunGraph);
 
         Command runDemoGraphCommand = new(
             "demoGraph",
@@ -39,6 +43,7 @@ static class Program
             rootCommand.Options[0],
             rootCommand.Options[1],
             rootCommand.Options[2],
+            rootCommand.Options[3],
             new Option<int>(
                 ["--numRandNodes", "-n"],
                 () => 0,
@@ -51,7 +56,7 @@ static class Program
         rootCommand.AddCommand(runDemoGraphCommand);
 
         runDemoGraphCommand.Handler = CommandHandler
-            .Create<string, int, float, float, int, int>(DemoRandomGraph.RunDemoGraph);
+            .Create<string, int, float, float, float, int, int>(DemoRandomGraph.RunDemoGraph);
 
         rootCommand.Invoke(args);
     }

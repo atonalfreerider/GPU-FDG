@@ -11,12 +11,17 @@ namespace GPU_FDG.Database;
 /// </summary>
 static class GenerateGraphFromData
 {
-    public static void RunGraph(string dbPath, int iterations, float springForce, float repulsiveForce)
+    public static void RunGraph(
+        string dbPath, 
+        int iterations, 
+        float springForce, 
+        float repulsiveForce,
+        float speedLimit)
     {
         SqliteInput input = new(dbPath);
         Dictionary<int, DbNode> nodes = input.DeSerialize();
 
-        ForceDirectedGraph forceDirectedGraph = new(repulsiveForce, springForce);
+        ForceDirectedGraph forceDirectedGraph = new(repulsiveForce, springForce, speedLimit);
 
         Dictionary<int, ForceDirectedGraph.Node> fdgNodes = new Dictionary<int, ForceDirectedGraph.Node>();
 
