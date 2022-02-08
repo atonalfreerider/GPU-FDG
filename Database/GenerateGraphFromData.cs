@@ -29,6 +29,7 @@ static class GenerateGraphFromData
         {
             ForceDirectedGraph.Node newNode = forceDirectedGraph.AddNodeToGraph((uint) key);
             newNode.Position = dbNode.Position;
+            newNode.Locked = dbNode.Locked;
             fdgNodes.Add(key, newNode);
         }
 

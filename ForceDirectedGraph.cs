@@ -85,6 +85,7 @@ public class ForceDirectedGraph
 
         // prepare native arrays for each calculation value
         float3[] nodePositions = new float3[nodeArrayLength];
+        int[] lockedNodes = new int[nodeArrayLength];
 
         // amount of edges tracked per node so that the edge indices can be traversed
         // example:
@@ -112,6 +113,7 @@ public class ForceDirectedGraph
             if (node == null) continue;
 
             nodePositions[idx] = node.Position;
+            lockedNodes[idx] = node.Locked ? 1 : 0;
             edgeBlockStartIndices[idx] = count;
             edgeBlockLengths[idx] = node.MyEdges.Count;
             count += node.MyEdges.Count;
@@ -123,6 +125,7 @@ public class ForceDirectedGraph
 
         using ReadWriteBuffer<float3> nodePositionsBuffer =
             GraphicsDevice.GetDefault().AllocateReadWriteBuffer(nodePositions);
+        using ReadOnlyBuffer<int> lockedNodesBuffer = GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(lockedNodes);
         using ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer =
             GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeBlockStartIndices);
         using ReadOnlyBuffer<int> edgeBlockLengthsBuffer =
@@ -131,6 +134,7 @@ public class ForceDirectedGraph
 
         ForceKernelShader forceKernelShader = new(
             nodePositionsBuffer,
+            lockedNodesBuffer,
             edgeBlockStartIndicesBuffer,
             edgeBlockLengthsBuffer,
             edgeIndicesBuffer,
@@ -172,6 +176,7 @@ public class ForceDirectedGraph
     {
         public Vector3 Position;
         public readonly List<uint> MyEdges = [];
+        public bool Locked;
     }
 }
 
@@ -179,6 +184,7 @@ public class ForceDirectedGraph
 [GeneratedComputeShaderDescriptor]
 public readonly partial struct ForceKernelShader(
     ReadWriteBuffer<float3> nodePositionsBuffer,
+    ReadOnlyBuffer<int> lockedNodes,
     ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer,
     ReadOnlyBuffer<int> edgeBlockLengthsBuffer,
     ReadOnlyBuffer<int> edgeIndicesBuffer,
@@ -191,6 +197,7 @@ public readonly partial struct ForceKernelShader(
     {
         // for this kernel, identify the index of the node that is getting acted upon
         int i = ThreadIds.X;
+        if (lockedNodes[i] == 1) return;
 
         float3 resultForceAndDirection = new(0, 0, 0);
 

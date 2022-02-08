@@ -57,6 +57,16 @@ public class SqliteInput(string dbPath)
                 }
             }
         }
+        
+        IEnumerable<int> lockedIds = LockedNodes(conn);
+        foreach (int lockedId in lockedIds)
+        {
+            nodes.TryGetValue(lockedId, out DbNode node);
+            if (node != null)
+            {
+                node.Locked = true;
+            }
+        }
 
         return RetrieveEdges(conn, nodes);
     }
@@ -82,6 +92,33 @@ public class SqliteInput(string dbPath)
         }
 
         return nodes;
+    }
+    
+    static IEnumerable<int> LockedNodes(IDbConnection conn)
+    {
+        List<int> lockedIds = new List<int>();
+            
+        List<string> columnNames = new List<string>
+        {
+            "locked_id"
+        };
+
+        using (IDbCommand cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = CommandString(columnNames, "locked");
+
+            using (IDataReader reader = cmd.ExecuteReader())
+            {
+                Dictionary<string, int> indexes = ColumnIndexes(reader, columnNames);
+                while (reader.Read())
+                {
+                    // sqlite dbs start from 1. shift to 0
+                    lockedIds.Add(reader.GetInt32(indexes["locked_id"]) - 1);
+                }
+            }
+        }
+
+        return lockedIds;
     }
 
     static string CommandString(IEnumerable<string> columnNames, string tableName)

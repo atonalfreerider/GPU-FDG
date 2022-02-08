@@ -8,4 +8,5 @@ public class DbNode
     public int id;
     public Vector3 Position;
     public readonly List<int> edgeIds = [];
+    public bool Locked = false;
 }
