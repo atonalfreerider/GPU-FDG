@@ -5,9 +5,9 @@ using GPU_FDG.DemoRandom;
 
 namespace GPU_FDG;
 
-class Program
+internal static class Program
 {
-    public class Args
+    internal class Args
     {
         public string DbPath { get; set; }
         public int Iterations { get; set; }
