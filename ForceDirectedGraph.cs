@@ -171,12 +171,12 @@ public class ForceDirectedGraph
 [AutoConstructor]
 public readonly partial struct ForceKernelShader : IComputeShader
 {
-    readonly ReadWriteBuffer<Float3> nodePositions;
+    readonly ReadWriteBuffer<Float3> nodePositionsBuffer;
 
     // values and relationships
-    readonly ReadOnlyBuffer<int> edgeBlockStartIndices;
-    readonly ReadOnlyBuffer<int> edgeBlockLengths;
-    readonly ReadOnlyBuffer<int> edgeIndices;
+    readonly ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer;
+    readonly ReadOnlyBuffer<int> edgeBlockLengthsBuffer;
+    readonly ReadOnlyBuffer<int> edgeIndicesBuffer;
     readonly int nodeArrayLength;
 
     // physics
@@ -191,14 +191,14 @@ public readonly partial struct ForceKernelShader : IComputeShader
         Float3 resultForceAndDirection = new(0, 0, 0);
 
         // get the current 3D position of the node 
-        Float3 nodeI = nodePositions[i];
+        Float3 nodeI = nodePositionsBuffer[i];
 
         // iterate through all of this node's edges and determine the attractive and repulsive forces acting on it
-        int edgeBlockStart = edgeBlockStartIndices[i];
-        int edgeBlockLength = edgeBlockLengths[i];
+        int edgeBlockStart = edgeBlockStartIndicesBuffer[i];
+        int edgeBlockLength = edgeBlockLengthsBuffer[i];
         for (int z = edgeBlockStart; z < edgeBlockStart + edgeBlockLength; z++)
         {
-            Float3 nodeJ = nodePositions[edgeIndices[z]];
+            Float3 nodeJ = nodePositionsBuffer[edgeIndicesBuffer[z]];
 
             // determine the directional vector between the two nodes
             Float3 v = nodeI - nodeJ;
@@ -226,7 +226,7 @@ public readonly partial struct ForceKernelShader : IComputeShader
             }
 
             // another node in space that is acting on this node
-            Float3 nodeJ = nodePositions[j];
+            Float3 nodeJ = nodePositionsBuffer[j];
 
             // determine the directional vector between the two nodes
             Float3 v = nodeI - nodeJ;
@@ -252,6 +252,6 @@ public readonly partial struct ForceKernelShader : IComputeShader
         }
 
         // set the final node position after this frame
-        nodePositions[i] += resultForceAndDirection;
+        nodePositionsBuffer[i] += resultForceAndDirection;
     }
 }

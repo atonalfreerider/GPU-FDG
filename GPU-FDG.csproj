@@ -4,14 +4,15 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>GPU_FDG</RootNamespace>
+        <LangVersion>10</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ComputeSharp" Version="2.0.0-alpha.20" />
-      <PackageReference Include="ComputeSharp.Dynamic" Version="2.0.0-alpha.20" />
-      <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
-      <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta3.22114.1" />
-      <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
+      <PackageReference Include="ComputeSharp" Version="2.0.0-alpha.25" />
+      <PackageReference Include="ComputeSharp.Dynamic" Version="2.0.0-alpha.25" />
+      <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+      <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1" />
+      <PackageReference Include="System.Data.SQLite" Version="1.0.116" />
     </ItemGroup>
 
 </Project>

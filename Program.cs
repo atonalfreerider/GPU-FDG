@@ -44,7 +44,7 @@ internal static class Program
                 "Number of random connections"),
         };
 
-        Argument outputArgument = new("DbPath");
+        Argument<string> outputArgument = new("DbPath");
         rootCommand.Add(outputArgument);
 
         rootCommand.Description = "Force Directed Graph using ComputeSharp";
