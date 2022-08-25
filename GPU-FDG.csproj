@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ComputeSharp" Version="2.0.0-alpha.25" />
-      <PackageReference Include="ComputeSharp.Dynamic" Version="2.0.0-alpha.25" />
+      <PackageReference Include="ComputeSharp" Version="2.0.0-alpha.27" />
+      <PackageReference Include="ComputeSharp.Dynamic" Version="2.0.0-alpha.27" />
       <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
       <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1" />
       <PackageReference Include="System.Data.SQLite" Version="1.0.116" />

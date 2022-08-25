@@ -5,7 +5,7 @@ using GPU_FDG.DemoRandom;
 
 namespace GPU_FDG;
 
-internal static class Program
+static class Program
 {
     internal class Args
     {

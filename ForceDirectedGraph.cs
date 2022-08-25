@@ -117,11 +117,11 @@ public class ForceDirectedGraph
 
         int[] edgeIndices = allEdges.ToArray();
 
-        using ReadWriteBuffer<Float3> nodePositionsBuffer = GraphicsDevice.Default.AllocateReadWriteBuffer(nodePositions);
+        using ReadWriteBuffer<Float3> nodePositionsBuffer = GraphicsDevice.GetDefault().AllocateReadWriteBuffer(nodePositions);
         using ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer =
-            GraphicsDevice.Default.AllocateReadOnlyBuffer(edgeBlockStartIndices);
-        using ReadOnlyBuffer<int> edgeBlockLengthsBuffer = GraphicsDevice.Default.AllocateReadOnlyBuffer(edgeBlockLengths);
-        using ReadOnlyBuffer<int> edgeIndicesBuffer = GraphicsDevice.Default.AllocateReadOnlyBuffer(edgeIndices);
+            GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeBlockStartIndices);
+        using ReadOnlyBuffer<int> edgeBlockLengthsBuffer = GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeBlockLengths);
+        using ReadOnlyBuffer<int> edgeIndicesBuffer = GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeIndices);
 
         ForceKernelShader forceKernelShader = new(
             nodePositionsBuffer,
@@ -137,7 +137,7 @@ public class ForceDirectedGraph
             Console.WriteLine($"{i}/{iterations}");
             try
             {
-                GraphicsDevice.Default.For(nodeArrayLength, forceKernelShader);
+                GraphicsDevice.GetDefault().For(nodeArrayLength, forceKernelShader);
             }
             catch (TargetInvocationException e)
             {
