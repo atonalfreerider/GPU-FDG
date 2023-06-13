@@ -1,3 +1,4 @@
+#pragma warning disable CA1416
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -209,7 +210,6 @@ public readonly partial struct ForceKernelShader : IComputeShader
             Float3 direction = Hlsl.Mul(dotRoot, v);
 
             // Hooke's Law attractive force p2 <- p1
-            // also divide by the amount of edges acting on this node as a dampening effect
             float hF = universalSpringForce * distance;
 
             resultForceAndDirection -= Hlsl.Mul(hF, direction);
