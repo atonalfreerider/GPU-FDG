@@ -219,7 +219,7 @@ public readonly partial struct ForceKernelShader(
             float3 direction = Hlsl.Mul(dotRoot, v);
 
             // Hooke's Law attractive force p2 <- p1
-            float hF = edgePowers[z] * universalSpringForce * distance;
+            float hF = edgePowers[z] * distance;
 
             resultForceAndDirection -= Hlsl.Mul(hF, direction);
         }
@@ -267,6 +267,6 @@ public readonly partial struct ForceKernelShader(
         }
 
         // set the final node position after this frame
-        nodePositionsBuffer[i] += resultForceAndDirection;
+        nodePositionsBuffer[i].YZ += resultForceAndDirection.YZ;
     }
 }

@@ -82,7 +82,9 @@ public class SqliteInput(string dbPath)
 
             nodes.TryGetValue(nodeAidx, out DbNode nodeA);
 
-            nodeA?.edgeIdsAndPower.Add(nodeBidx, power);
+            power = MathF.Max(power, 0f);
+
+            nodeA?.edgeIdsAndPower.TryAdd(nodeBidx, power / 4f); // BUG the values are greater than 1 (up to 3.6)
         }
 
         return nodes;
