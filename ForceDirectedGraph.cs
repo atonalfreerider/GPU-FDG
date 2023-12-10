@@ -1,4 +1,3 @@
-#pragma warning disable CA1416
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,7 +80,7 @@ public class ForceDirectedGraph
         int nodeArrayLength = nodes.Count;
 
         // prepare native arrays for each calculation value
-        Float3[] nodePositions = new Float3[nodeArrayLength];
+        float3[] nodePositions = new float3[nodeArrayLength];
 
         // amount of edges tracked per node so that the edge indices can be traversed
         // example:
@@ -100,7 +99,7 @@ public class ForceDirectedGraph
         int[] edgeBlockStartIndices = new int[nodeArrayLength];
 
         // all edges flattened together in one list
-        List<int> allEdges = new List<int>();
+        List<int> allEdges = [];
 
         int count = 0;
         for (int idx = 0; idx < nodeArrayLength; idx++)
@@ -118,10 +117,12 @@ public class ForceDirectedGraph
 
         int[] edgeIndices = allEdges.ToArray();
 
-        using ReadWriteBuffer<Float3> nodePositionsBuffer = GraphicsDevice.GetDefault().AllocateReadWriteBuffer(nodePositions);
+        using ReadWriteBuffer<float3> nodePositionsBuffer =
+            GraphicsDevice.GetDefault().AllocateReadWriteBuffer(nodePositions);
         using ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer =
             GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeBlockStartIndices);
-        using ReadOnlyBuffer<int> edgeBlockLengthsBuffer = GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeBlockLengths);
+        using ReadOnlyBuffer<int> edgeBlockLengthsBuffer =
+            GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeBlockLengths);
         using ReadOnlyBuffer<int> edgeIndicesBuffer = GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeIndices);
 
         ForceKernelShader forceKernelShader = new(
@@ -152,7 +153,7 @@ public class ForceDirectedGraph
             }
         }
 
-        Float3[] resultNodePositions = nodePositionsBuffer.ToArray();
+        float3[] resultNodePositions = nodePositionsBuffer.ToArray();
         Vector3[] results = new Vector3 [nodeArrayLength];
         for (int i = 0; i < nodeArrayLength; i++)
         {
@@ -165,49 +166,45 @@ public class ForceDirectedGraph
     public class Node
     {
         public Vector3 Position;
-        public readonly List<uint> MyEdges = new();
+        public readonly List<uint> MyEdges = [];
     }
 }
 
-[AutoConstructor]
-public readonly partial struct ForceKernelShader : IComputeShader
+[ThreadGroupSize(DefaultThreadGroupSizes.X)]
+[GeneratedComputeShaderDescriptor]
+public readonly partial struct ForceKernelShader(
+    ReadWriteBuffer<float3> nodePositionsBuffer,
+    ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer,
+    ReadOnlyBuffer<int> edgeBlockLengthsBuffer,
+    ReadOnlyBuffer<int> edgeIndicesBuffer,
+    int nodeArrayLength,
+    float universalRepulsiveForce,
+    float universalSpringForce) : IComputeShader
 {
-    readonly ReadWriteBuffer<Float3> nodePositionsBuffer;
-
-    // values and relationships
-    readonly ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer;
-    readonly ReadOnlyBuffer<int> edgeBlockLengthsBuffer;
-    readonly ReadOnlyBuffer<int> edgeIndicesBuffer;
-    readonly int nodeArrayLength;
-
-    // physics
-    readonly float universalRepulsiveForce;
-    readonly float universalSpringForce;
-
     public void Execute()
     {
         // for this kernel, identify the index of the node that is getting acted upon
         int i = ThreadIds.X;
 
-        Float3 resultForceAndDirection = new(0, 0, 0);
+        float3 resultForceAndDirection = new(0, 0, 0);
 
         // get the current 3D position of the node 
-        Float3 nodeI = nodePositionsBuffer[i];
+        float3 nodeI = nodePositionsBuffer[i];
 
         // iterate through all of this node's edges and determine the attractive and repulsive forces acting on it
         int edgeBlockStart = edgeBlockStartIndicesBuffer[i];
         int edgeBlockLength = edgeBlockLengthsBuffer[i];
         for (int z = edgeBlockStart; z < edgeBlockStart + edgeBlockLength; z++)
         {
-            Float3 nodeJ = nodePositionsBuffer[edgeIndicesBuffer[z]];
+            float3 nodeJ = nodePositionsBuffer[edgeIndicesBuffer[z]];
 
             // determine the directional vector between the two nodes
-            Float3 v = nodeI - nodeJ;
+            float3 v = nodeI - nodeJ;
             float dot = Hlsl.Dot(v, v);
             float distance = Hlsl.Sqrt(dot);
             float dotRoot = Hlsl.Rsqrt(dot);
 
-            Float3 direction = Hlsl.Mul(dotRoot, v);
+            float3 direction = Hlsl.Mul(dotRoot, v);
 
             // Hooke's Law attractive force p2 <- p1
             float hF = universalSpringForce * distance;
@@ -226,15 +223,15 @@ public readonly partial struct ForceKernelShader : IComputeShader
             }
 
             // another node in space that is acting on this node
-            Float3 nodeJ = nodePositionsBuffer[j];
+            float3 nodeJ = nodePositionsBuffer[j];
 
             // determine the directional vector between the two nodes
-            Float3 v = nodeI - nodeJ;
+            float3 v = nodeI - nodeJ;
             float dot = Hlsl.Dot(v, v);
             float distance = Hlsl.Sqrt(dot);
             float dotRoot = Hlsl.Rsqrt(dot);
 
-            Float3 direction = Hlsl.Mul(dotRoot, v);
+            float3 direction = Hlsl.Mul(dotRoot, v);
 
             // Coulomb's Law repulsive force p2 -> p1 
             float cF = universalRepulsiveForce / (distance * distance);
@@ -248,7 +245,7 @@ public readonly partial struct ForceKernelShader : IComputeShader
             Hlsl.IsNaN(resultForceAndDirection.Z))
         {
             // catch asymptotic cases 
-            resultForceAndDirection = new Float3(0, 0, 0);
+            resultForceAndDirection = new float3(0, 0, 0);
         }
 
         // set the final node position after this frame

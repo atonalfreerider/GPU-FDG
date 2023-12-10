@@ -39,20 +39,24 @@ public class SqliteOutput
         using (IDbCommand cmd = conn.CreateCommand())
         {
             cmd.CommandText =
-                @"CREATE TABLE nodes (
-                          id INTEGER PRIMARY KEY ASC,
-                          position_x REAL NOT NULL,
-                          position_y REAL NOT NULL,
-                          position_z REAL NOT NULL
-                      )";
+                """
+                CREATE TABLE nodes (
+                    id INTEGER PRIMARY KEY ASC,
+                    position_x REAL NOT NULL,
+                    position_y REAL NOT NULL,
+                    position_z REAL NOT NULL
+                )
+                """;
             cmd.ExecuteNonQuery();
 
             cmd.CommandText =
-                @"CREATE TABLE edges (
-                          id INTEGER PRIMARY KEY ASC,
-                          node1 INTEGER NOT NULL,
-                          node2 INTEGER NOT NULL
-                      )";
+                """
+                CREATE TABLE edges (
+                    id INTEGER PRIMARY KEY ASC,
+                    node1 INTEGER NOT NULL,
+                    node2 INTEGER NOT NULL
+                )
+                """;
             cmd.ExecuteNonQuery();
         }
 
@@ -79,15 +83,17 @@ public class SqliteOutput
         using IDbCommand cmd = conn.CreateCommand();
         using IDbTransaction transaction = conn.BeginTransaction();
         cmd.CommandText =
-            @"INSERT INTO nodes (
-                          position_x,
-                          position_y,
-                          position_z
-                      ) VALUES (
-                          @PositionX,
-                          @PositionY,
-                          @PositionZ
-                      )";
+            """
+            INSERT INTO nodes (
+                position_x,
+                position_y,
+                position_z
+            ) VALUES (
+                @PositionX,
+                @PositionY,
+                @PositionZ
+            )
+            """;
 
         foreach (Vector3 position in positions)
         {
@@ -133,12 +139,12 @@ public class SqliteOutput
                 count++;
                 continue;
             }
-            cmd.CommandText = @"  
+            cmd.CommandText = @"
                         UPDATE nodes  
                         SET   
-                            position_x = " + next.X + @",  
-                            position_y = " + next.Y + @",  
-                            position_z = " + next.Z + @"  
+                            position_x = " + next.X + @",
+                            position_y = " + next.Y + @",
+                            position_z = " + next.Z + @"
                         WHERE id = " + count;
 
             cmd.ExecuteNonQuery();
@@ -156,13 +162,15 @@ public class SqliteOutput
         using IDbCommand cmd = conn.CreateCommand();
         using IDbTransaction transaction = conn.BeginTransaction();
         cmd.CommandText =
-            @"INSERT INTO edges (
-                          node1,
-                          node2
-                      ) VALUES (
-                          @Node1,
-                          @Node2
-                      )";
+            """
+            INSERT INTO edges (
+                node1,
+                node2
+            ) VALUES (
+                @Node1,
+                @Node2
+            )
+            """;
 
         foreach (uint[] edge in edges)
         {

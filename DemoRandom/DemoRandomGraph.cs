@@ -52,9 +52,7 @@ static class DemoRandomGraph
             // pair the edge using Szudzik
             ulong hash = tupleBase.uintSzudzik2tupleCombine(nodeAIdx, nodeBIdx);
 
-            if (edgeCombinations.Contains(hash)) continue;
-
-            edgeCombinations.Add(hash);
+            if (!edgeCombinations.Add(hash)) continue;
 
             ForceDirectedGraph.Node nodeA = randomNodes[nodeAIdx];
             ForceDirectedGraph.Node nodeB = randomNodes[nodeBIdx];

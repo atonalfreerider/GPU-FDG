@@ -20,29 +20,34 @@ static class Program
     static void Main(string[] args)
     {
         // Create a root command with some options
-        RootCommand rootCommand = new()
-        {
+        RootCommand rootCommand =
+        [
             new Option<int>(
-                new[] {"--iterations", "-i"},
+                new[] { "--iterations", "-i" },
                 () => 50,
                 "Iterations"),
+
             new Option<float>(
-                new[] {"--springForce", "-k"},
+                new[] { "--springForce", "-k" },
                 () => .15f,
                 "Universal spring force (must be less than 1)"),
+
             new Option<float>(
-                new[] {"--repulsiveForce", "-e"},
+                new[] { "--repulsiveForce", "-e" },
                 () => 1,
                 "Universal repulsive force"),
+
             new Option<int>(
-                new[] {"--numRandNodes", "-n"},
+                new[] { "--numRandNodes", "-n" },
                 () => 0,
                 "Number of random nodes"),
+
             new Option<int>(
-                new[] {"--numRandConnections", "-c"},
+                new[] { "--numRandConnections", "-c" },
                 () => 0,
-                "Number of random connections"),
-        };
+                "Number of random connections")
+
+        ];
 
         Argument<string> outputArgument = new("DbPath");
         rootCommand.Add(outputArgument);

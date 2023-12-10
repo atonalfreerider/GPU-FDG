@@ -7,30 +7,21 @@ using System.Numerics;
 
 namespace GPU_FDG.Database;
 
-public class SqliteInput
+public class SqliteInput(string dbPath)
 {
-    static readonly Random rand = new(); 
-    readonly string DbPath;
-
-    public SqliteInput(string dbPath)
-    {
-        DbPath = dbPath;
-    }
+    static readonly Random rand = new();
 
     public Dictionary<int, DbNode> DeSerialize()
     {
         Dictionary<int, DbNode> nodes = new Dictionary<int, DbNode>();
-        if (string.IsNullOrEmpty(DbPath)) return nodes;
+        if (string.IsNullOrEmpty(dbPath)) return nodes;
 
-        string cs = $"URI=file:{DbPath}";
+        string cs = $"URI=file:{dbPath}";
 
         using SQLiteConnection conn = new(cs);
         conn.Open();
 
-        List<string> columnNames = new List<string>
-        {
-            "id", "position_x", "position_y", "position_z"
-        };
+        List<string> columnNames = ["id", "position_x", "position_y", "position_z"];
 
         using (IDbCommand cmd = conn.CreateCommand())
         {
@@ -72,10 +63,7 @@ public class SqliteInput
 
     static Dictionary<int, DbNode> RetrieveEdges(IDbConnection conn, Dictionary<int, DbNode> nodes)
     {
-        List<string> columnNames = new List<string>
-        {
-            "node1", "node2"
-        };
+        List<string> columnNames = ["node1", "node2"];
 
         using IDbCommand cmd = conn.CreateCommand();
         cmd.CommandText = CommandString(columnNames, "edges");
@@ -103,7 +91,7 @@ public class SqliteInput
             (current, columnName) => current + $"{columnName}, ");
 
         // remove last comma
-        cmd = cmd.Substring(0, cmd.Length - 2) + " ";
+        cmd = cmd[..^2] + " ";
         cmd += $"FROM {tableName}";
 
         return cmd;
