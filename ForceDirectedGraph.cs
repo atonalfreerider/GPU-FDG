@@ -104,6 +104,7 @@ public class ForceDirectedGraph
 
         // all edges flattened together in one list
         List<int> allEdges = [];
+        List<int> edgePowers = [];
 
         int count = 0;
         for (int idx = 0; idx < nodeArrayLength; idx++)
@@ -113,13 +114,15 @@ public class ForceDirectedGraph
 
             nodePositions[idx] = node.Position;
             edgeBlockStartIndices[idx] = count;
-            edgeBlockLengths[idx] = node.MyEdges.Count;
-            count += node.MyEdges.Count;
+            edgeBlockLengths[idx] = node.MyEdgesAndPower.Count;
+            count += node.MyEdgesAndPower.Count;
 
-            allEdges.AddRange(node.MyEdges.Select(Convert.ToInt32));
+            foreach ((uint edgeIdx, int edgePower) in node.MyEdgesAndPower)
+            {
+                allEdges.Add((int) edgeIdx);
+                edgePowers.Add(edgePower);
+            }
         }
-
-        int[] edgeIndices = allEdges.ToArray();
 
         using ReadWriteBuffer<float3> nodePositionsBuffer =
             GraphicsDevice.GetDefault().AllocateReadWriteBuffer(nodePositions);
@@ -127,13 +130,15 @@ public class ForceDirectedGraph
             GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeBlockStartIndices);
         using ReadOnlyBuffer<int> edgeBlockLengthsBuffer =
             GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeBlockLengths);
-        using ReadOnlyBuffer<int> edgeIndicesBuffer = GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeIndices);
+        using ReadOnlyBuffer<int> edgeIndicesBuffer = GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(allEdges.ToArray());
+        using ReadOnlyBuffer<int> edgePowersBuffer = GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgePowers.ToArray());
 
         ForceKernelShader forceKernelShader = new(
             nodePositionsBuffer,
             edgeBlockStartIndicesBuffer,
             edgeBlockLengthsBuffer,
             edgeIndicesBuffer,
+            edgePowersBuffer,
             nodeArrayLength,
             universalRepulsiveForce,
             universalSpringForce,
@@ -171,7 +176,7 @@ public class ForceDirectedGraph
     public class Node
     {
         public Vector3 Position;
-        public readonly List<uint> MyEdges = [];
+        public readonly Dictionary<uint, int> MyEdgesAndPower = new();
     }
 }
 
@@ -182,6 +187,7 @@ public readonly partial struct ForceKernelShader(
     ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer,
     ReadOnlyBuffer<int> edgeBlockLengthsBuffer,
     ReadOnlyBuffer<int> edgeIndicesBuffer,
+    ReadOnlyBuffer<int> edgePowers,
     int nodeArrayLength,
     float universalRepulsiveForce,
     float universalSpringForce,
@@ -213,7 +219,7 @@ public readonly partial struct ForceKernelShader(
             float3 direction = Hlsl.Mul(dotRoot, v);
 
             // Hooke's Law attractive force p2 <- p1
-            float hF = universalSpringForce * distance;
+            float hF = edgePowers[z] * universalSpringForce * distance;
 
             resultForceAndDirection -= Hlsl.Mul(hF, direction);
         }

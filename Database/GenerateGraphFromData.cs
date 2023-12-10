@@ -35,11 +35,31 @@ static class GenerateGraphFromData
         foreach ((int key, DbNode dbNode) in nodes)
         {
             fdgNodes.TryGetValue(key, out ForceDirectedGraph.Node nodeA);
+            if (nodeA == null) continue;
             foreach (int dependencyKey in dbNode.edgeIds)
             {
+                uint uDependencyKey = (uint) dependencyKey;
                 fdgNodes.TryGetValue(dependencyKey, out ForceDirectedGraph.Node nodeB);
-                nodeA?.MyEdges.Add((uint) dependencyKey);
-                nodeB?.MyEdges.Add((uint) key);
+                if (nodeB == null) continue;
+
+                if (nodeA.MyEdgesAndPower.ContainsKey(uDependencyKey))
+                {
+                    nodeA.MyEdgesAndPower[uDependencyKey]++;
+                }
+                else
+                {
+                    nodeA.MyEdgesAndPower.Add(uDependencyKey, 1);
+                }
+
+                uint uKey = (uint) key;
+                if (nodeB.MyEdgesAndPower.ContainsKey(uKey))
+                {
+                    nodeB.MyEdgesAndPower[uKey]++;
+                }
+                else
+                {
+                    nodeB.MyEdgesAndPower.Add(uKey, 1);
+                }
             }
         }
 
