@@ -104,7 +104,7 @@ public class ForceDirectedGraph
 
         // all edges flattened together in one list
         List<int> allEdges = [];
-        List<int> edgePowers = [];
+        List<float> edgePowers = [];
 
         int count = 0;
         for (int idx = 0; idx < nodeArrayLength; idx++)
@@ -117,7 +117,7 @@ public class ForceDirectedGraph
             edgeBlockLengths[idx] = node.MyEdgesAndPower.Count;
             count += node.MyEdgesAndPower.Count;
 
-            foreach ((uint edgeIdx, int edgePower) in node.MyEdgesAndPower)
+            foreach ((uint edgeIdx, float edgePower) in node.MyEdgesAndPower)
             {
                 allEdges.Add((int) edgeIdx);
                 edgePowers.Add(edgePower);
@@ -131,7 +131,7 @@ public class ForceDirectedGraph
         using ReadOnlyBuffer<int> edgeBlockLengthsBuffer =
             GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgeBlockLengths);
         using ReadOnlyBuffer<int> edgeIndicesBuffer = GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(allEdges.ToArray());
-        using ReadOnlyBuffer<int> edgePowersBuffer = GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgePowers.ToArray());
+        using ReadOnlyBuffer<float> edgePowersBuffer = GraphicsDevice.GetDefault().AllocateReadOnlyBuffer(edgePowers.ToArray());
 
         ForceKernelShader forceKernelShader = new(
             nodePositionsBuffer,
@@ -176,7 +176,7 @@ public class ForceDirectedGraph
     public class Node
     {
         public Vector3 Position;
-        public readonly Dictionary<uint, int> MyEdgesAndPower = new();
+        public readonly Dictionary<uint, float> MyEdgesAndPower = new();
     }
 }
 
@@ -187,7 +187,7 @@ public readonly partial struct ForceKernelShader(
     ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer,
     ReadOnlyBuffer<int> edgeBlockLengthsBuffer,
     ReadOnlyBuffer<int> edgeIndicesBuffer,
-    ReadOnlyBuffer<int> edgePowers,
+    ReadOnlyBuffer<float> edgePowers,
     int nodeArrayLength,
     float universalRepulsiveForce,
     float universalSpringForce,

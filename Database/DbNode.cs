@@ -7,5 +7,5 @@ public class DbNode
 {
     public int id;
     public Vector3 Position;
-    public readonly List<int> edgeIds = [];
+    public readonly Dictionary<int, float> edgeIdsAndPower = new();
 }

@@ -63,7 +63,10 @@ public class SqliteInput(string dbPath)
 
     static Dictionary<int, DbNode> RetrieveEdges(IDbConnection conn, Dictionary<int, DbNode> nodes)
     {
-        List<string> columnNames = ["node1", "node2"];
+        List<string> columnNames = new List<string>
+        {
+            "node1", "node2", "power"
+        };
 
         using IDbCommand cmd = conn.CreateCommand();
         cmd.CommandText = CommandString(columnNames, "edges");
@@ -75,10 +78,11 @@ public class SqliteInput(string dbPath)
             // sqlite dbs start at 1. shift to 0.
             int nodeAidx = reader.GetInt32(indexes["node1"]) - 1;
             int nodeBidx = reader.GetInt32(indexes["node2"]) - 1;
+            float power = reader.GetFloat(indexes["power"]);
 
             nodes.TryGetValue(nodeAidx, out DbNode nodeA);
 
-            nodeA?.edgeIds.Add(nodeBidx);
+            nodeA?.edgeIdsAndPower.Add(nodeBidx, power);
         }
 
         return nodes;
