@@ -80,7 +80,7 @@ public class tupleBase
         byte y = (byte) (z - T);
         byte x = (byte) (W - y);
 
-        return new byte[] {x, y};
+        return [x, y];
     }
 
     #endregion
@@ -167,9 +167,9 @@ public class tupleBase
         ushort zSpecial2 = (ushort) (z - (zSpecial1 * zSpecial1)); //this number WILL be positive (returns integer)
 
         if (zSpecial2 < zSpecial1)
-            return new byte[] {(byte) zSpecial2, (byte) zSpecial1};
+            return [(byte) zSpecial2, (byte) zSpecial1];
         else
-            return new byte[] {(byte) zSpecial1, (byte) (zSpecial2 - zSpecial1)};
+            return [(byte) zSpecial1, (byte) (zSpecial2 - zSpecial1)];
     }
 
     #endregion
@@ -190,9 +190,9 @@ public class tupleBase
         uint zSpecial2 = (uint) (z - (zSpecial1 * zSpecial1)); //this number WILL be positive (returns integer)
 
         if (zSpecial2 < zSpecial1)
-            return new ushort[] {(ushort) zSpecial2, (ushort) zSpecial1};
+            return [(ushort) zSpecial2, (ushort) zSpecial1];
         else
-            return new ushort[] {(ushort) zSpecial1, (ushort) (zSpecial2 - zSpecial1)};
+            return [(ushort) zSpecial1, (ushort) (zSpecial2 - zSpecial1)];
     }
 
     #endregion
@@ -213,9 +213,9 @@ public class tupleBase
         ulong zSpecial2 = (ulong) (z - (zSpecial1 * zSpecial1)); //this number WILL be positive (returns integer)
 
         if (zSpecial2 < zSpecial1)
-            return new uint[] {(uint) zSpecial2, (uint) zSpecial1};
+            return [(uint) zSpecial2, (uint) zSpecial1];
         else
-            return new uint[] {(uint) zSpecial1, (uint) (zSpecial2 - zSpecial1)};
+            return [(uint) zSpecial1, (uint) (zSpecial2 - zSpecial1)];
     }
 
     #endregion

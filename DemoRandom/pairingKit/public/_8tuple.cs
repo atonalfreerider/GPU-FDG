@@ -2634,7 +2634,7 @@ public static class _8tuple //1 type range [(byte/sbyte)]
         uint[] P1_P2 = _2tuple.reverse(z);
         byte[] abcd = _4tuple.reverse(P1_P2[0]);
         byte[] efgh = _4tuple.reverse(P1_P2[1]);
-        return new byte[] {abcd[0], abcd[1], abcd[2], abcd[3], efgh[0], efgh[1], efgh[2], efgh[3]};
+        return [abcd[0], abcd[1], abcd[2], abcd[3], efgh[0], efgh[1], efgh[2], efgh[3]];
     }
 
     #endregion

@@ -1551,7 +1551,7 @@ public static class _4tuple //2 type ranges [(byte/sbyte)|(ushort/short)]
         ushort[] AB_CD = _2tuple.reverse(z);
         byte[] ab = _2tuple.reverse(AB_CD[0]);
         byte[] cd = _2tuple.reverse(AB_CD[1]);
-        return new byte[] {ab[0], ab[1], cd[0], cd[1]};
+        return [ab[0], ab[1], cd[0], cd[1]];
     }
 
     //[(a,b) , (c,d)]
@@ -1560,7 +1560,7 @@ public static class _4tuple //2 type ranges [(byte/sbyte)|(ushort/short)]
         uint[] AB_CD = _2tuple.reverse(z);
         ushort[] ab = _2tuple.reverse(AB_CD[0]);
         ushort[] cd = _2tuple.reverse(AB_CD[1]);
-        return new ushort[] {ab[0], ab[1], cd[0], cd[1]};
+        return [ab[0], ab[1], cd[0], cd[1]];
     }
 
     #endregion

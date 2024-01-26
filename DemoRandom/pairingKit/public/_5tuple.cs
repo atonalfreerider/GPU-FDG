@@ -382,7 +382,7 @@ public static class _5tuple //1 type range [(byte/sbyte)]
         uint[] P1_P2 = _2tuple.reverse(z);
         ushort[] ab = _2tuple.reverse(P1_P2[0]);
         byte[] cde = _3tuple.reverse(P1_P2[1]);
-        return new byte[] {(byte) ab[0], (byte) ab[1], (byte) cde[0], (byte) cde[1], (byte) cde[2]};
+        return [(byte) ab[0], (byte) ab[1], (byte) cde[0], (byte) cde[1], (byte) cde[2]];
     }
 
     #endregion

@@ -706,7 +706,7 @@ public static class _6tuple //1 type range [(byte/sbyte)]
         uint[] P1_P2 = _2tuple.reverse(z);
         byte[] abcd = _4tuple.reverse(P1_P2[0]);
         ushort[] ef = _2tuple.reverse(P1_P2[1]);
-        return new byte[] {abcd[0], abcd[1], abcd[2], abcd[3], (byte) ef[0], (byte) ef[1]};
+        return [abcd[0], abcd[1], abcd[2], abcd[3], (byte) ef[0], (byte) ef[1]];
     }
 
     #endregion

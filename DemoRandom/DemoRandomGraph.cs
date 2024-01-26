@@ -16,22 +16,28 @@ static class DemoRandomGraph
 {
     static readonly Random rand = new();
 
-    public static void RunDemoGraph(Program.Args args)
+    public static void RunDemoGraph(
+        string dbPath, 
+        int iterations,
+        float springForce, 
+        float repulsiveForce,
+        int numRandNodes,
+        int numRandConnections)
     {
-        ForceDirectedGraph forceDirectedGraph = new(args.RepulsiveForce, args.SpringForce);
+        ForceDirectedGraph forceDirectedGraph = new(repulsiveForce, springForce);
 
         ForceDirectedGraph.Node node0 = forceDirectedGraph.AddNodeToGraph(0);
         node0.Position = new Vector3(0, 0, 0);
 
         Dictionary<uint, ForceDirectedGraph.Node> randomNodes =
             new Dictionary<uint, ForceDirectedGraph.Node> {{0, node0}};
-        double scaleFactor = args.NumRandNodes / 100d;
+        double scaleFactor = numRandNodes / 100d;
         if (scaleFactor < 10)
         {
             scaleFactor = 10;
         }
 
-        for (int i = 1; i < args.NumRandNodes; i++)
+        for (int i = 1; i < numRandNodes; i++)
         {
             ForceDirectedGraph.Node newNode = forceDirectedGraph.AddNodeToGraph((uint) i);
             newNode.Position = new Vector3(
@@ -41,11 +47,11 @@ static class DemoRandomGraph
             randomNodes.Add((uint) i, newNode);
         }
 
-        HashSet<ulong> edgeCombinations = new HashSet<ulong>();
-        for (int i = 0; i < args.NumRandConnections; i++)
+        HashSet<ulong> edgeCombinations = [];
+        for (int i = 0; i < numRandConnections; i++)
         {
-            uint nodeAIdx = (uint) rand.Next(1, args.NumRandNodes);
-            uint nodeBIdx = (uint) rand.Next(1, args.NumRandNodes);
+            uint nodeAIdx = (uint) rand.Next(1, numRandNodes);
+            uint nodeBIdx = (uint) rand.Next(1, numRandNodes);
 
             if (nodeAIdx == nodeBIdx) continue;
 
@@ -61,11 +67,11 @@ static class DemoRandomGraph
             nodeB.MyEdges.Add(nodeAIdx);
         }
 
-        Vector3[] results = forceDirectedGraph.RunGraph(args.Iterations);
+        Vector3[] results = forceDirectedGraph.RunGraph(iterations);
 
-        Console.WriteLine($"Writing to {args.DbPath}");
+        Console.WriteLine($"Writing to {dbPath}");
             
-        SqliteOutput output = new(args.DbPath);
+        SqliteOutput output = new(dbPath);
             
         // de-pair the edge to recover the original nodes
         IEnumerable<uint[]> edgePairs = edgeCombinations
