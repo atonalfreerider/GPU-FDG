@@ -74,7 +74,7 @@ public class ForceDirectedGraph
         if (universalSpringForce >= 1f)
         {
             Console.WriteLine("Universal Spring Force must be less than 1");
-            return Array.Empty<Vector3>();
+            return [];
         }
 
         int nodeArrayLength = nodes.Count;
@@ -172,7 +172,7 @@ public class ForceDirectedGraph
 
 [ThreadGroupSize(DefaultThreadGroupSizes.X)]
 [GeneratedComputeShaderDescriptor]
-public readonly partial struct ForceKernelShader(
+internal readonly partial struct ForceKernelShader(
     ReadWriteBuffer<float3> nodePositionsBuffer,
     ReadOnlyBuffer<int> edgeBlockStartIndicesBuffer,
     ReadOnlyBuffer<int> edgeBlockLengthsBuffer,
